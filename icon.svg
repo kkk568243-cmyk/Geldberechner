@@ -1,8 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="90" fill="#0d0e12"/>
-  <circle cx="256" cy="256" r="195" fill="none" stroke="#34d399" stroke-width="18"/>
-  <circle cx="256" cy="256" r="155" fill="#1b1e28"/>
-  <text x="256" y="315" text-anchor="middle"
-        font-family="'Courier New',monospace"
-        font-size="150" font-weight="bold" fill="#f5c842">€</text>
+
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd86a"/>
+      <stop offset="100%" stop-color="#d89a18"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="110" fill="#08080d"/>
+
+  <circle
+      cx="256"
+      cy="256"
+      r="120"
+      fill="none"
+      stroke="url(#gold)"
+      stroke-width="16"/>
+
+  <text
+      x="256"
+      y="300"
+      text-anchor="middle"
+      font-family="Inter, Arial, sans-serif"
+      font-size="120"
+      font-weight="800"
+      fill="url(#gold)">€</text>
+
 </svg>
