@@ -1,62 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 680">
   <defs>
-
-    <!-- Hintergrund -->
-    <radialGradient id="bg" cx="50%" cy="45%" r="70%">
-      <stop offset="0%" stop-color="#0f1118"/>
-      <stop offset="100%" stop-color="#050608"/>
-    </radialGradient>
-
-    <!-- Hauptgradient -->
-    <linearGradient id="neo" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ff5f6d"/>
-      <stop offset="45%" stop-color="#5b8cff"/>
-      <stop offset="100%" stop-color="#39d98a"/>
+    <linearGradient id="eurograd" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#c0392b" stop-opacity="0.85"/>
+      <stop offset="50%"  stop-color="#2980b9" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#27ae60" stop-opacity="0.85"/>
     </linearGradient>
-
-    <!-- Glow -->
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="8" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-
+    <linearGradient id="ringgrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#c0392b" stop-opacity="0.5"/>
+      <stop offset="50%"  stop-color="#2980b9" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#27ae60" stop-opacity="0.5"/>
+    </linearGradient>
   </defs>
 
-  <!-- Schwarzer Hintergrund -->
-  <rect width="512" height="512" rx="95" fill="url(#bg)"/>
+  <rect width="680" height="680" rx="110" fill="#0d0f16"/>
+  <circle cx="340" cy="340" r="255" fill="none" stroke="#1c2035" stroke-width="32"/>
+  <circle cx="340" cy="340" r="255" fill="none" stroke="url(#ringgrad)" stroke-width="4"/>
 
-  <!-- Innerer Schatten-Kreis -->
-  <circle
-      cx="256"
-      cy="256"
-      r="145"
-      fill="#0b0d13"
-      opacity="0.95"/>
-
-  <!-- Äußerer Ring -->
-  <path
-      d="M108 212
-         A180 180 0 1 1 170 405"
-      fill="none"
-      stroke="url(#neo)"
-      stroke-width="12"
-      stroke-linecap="round"
-      filter="url(#glow)"/>
-
-  <!-- Euro Symbol -->
-  <text
-      x="256"
-      y="308"
-      text-anchor="middle"
-      font-family="Inter, Arial, sans-serif"
-      font-size="170"
-      font-weight="800"
-      fill="url(#neo)"
-      filter="url(#glow)">€</text>
-
+  <text x="340" y="460"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="380"
+    font-weight="700"
+    fill="url(#eurograd)">€</text>
 </svg>
