@@ -710,10 +710,33 @@ function saveFile(){
     lines.push("");
   }
   lines.push("\u2550".repeat(42),"  St\u00FCck gesamt  : "+tn,"  GESAMTBETRAG  : "+fmt(tc),"\u2550".repeat(42));
-  const blob=new Blob(["\uFEFF"+lines.join("\r\n")],{type:"text/plain;charset=utf-8"});
-  const url=URL.createObjectURL(blob);const a=document.createElement("a");
-  a.href=url;a.download="geldzaehler.txt";a.click();URL.revokeObjectURL(url);
-  showToast("✓ geldzaehler.txt gespeichert");
+  const content="\uFEFF"+lines.join("\r\n");
+  const fileName="geldzaehler.txt";
+  if(window.showSaveFilePicker){
+    (async()=>{
+      try{
+        const fh=await window.showSaveFilePicker({
+          suggestedName:fileName,
+          types:[{description:'Textdatei',accept:{'text/plain':['.txt']}}]
+        });
+        const writable=await fh.createWritable();
+        await writable.write(content);
+        await writable.close();
+        showToast("✓ geldzaehler.txt gespeichert");
+      }catch(e){
+        if(e.name==='AbortError')return;
+        const blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+        const url=URL.createObjectURL(blob);const a=document.createElement("a");
+        a.href=url;a.download=fileName;a.click();URL.revokeObjectURL(url);
+        showToast("✓ geldzaehler.txt gespeichert");
+      }
+    })();
+  } else {
+    const blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+    const url=URL.createObjectURL(blob);const a=document.createElement("a");
+    a.href=url;a.download=fileName;a.click();URL.revokeObjectURL(url);
+    showToast("✓ geldzaehler.txt gespeichert");
+  }
 }
 
 function loadFile(event){
