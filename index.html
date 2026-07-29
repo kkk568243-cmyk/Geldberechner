@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { outline: none; -webkit-tap-highlight-color: transparent; }
     :root {
       --bg:#0e1216;
       --surface:#1b2129;
@@ -45,16 +46,14 @@
       color: var(--text);
       font-family: "Inter", sans-serif;
       min-height: 100dvh;
+      transition: background .25s ease, color .25s ease;
       padding: max(env(safe-area-inset-top,0px),20px) 14px max(calc(env(safe-area-inset-bottom,0px) + 28px),32px);
       max-width: 520px; margin: 0 auto;
       position: relative;
     }
 
     /* ===== ANIMATED BACKGROUND ("GELDGLANZ", CLEAN) ===== */
-    .bg-clouds {
-      position: fixed; inset: -10vh -10vw; z-index: -1; overflow: hidden;
-      pointer-events: none;
-    }
+    .bg-clouds { display:none; }
     .bg-clouds span {
       position: absolute; border-radius: 50%; filter: blur(120px);
       will-change: transform, opacity;
@@ -124,7 +123,116 @@
       display:flex; align-items:center; justify-content:center;
       -webkit-tap-highlight-color:transparent; transition:all .15s;
     }
-    .btn-info:active { background:linear-gradient(135deg, rgba(235,148,78,0.465) 0%, rgba(193,74,95,0.341) 100%); transform:scale(.92); }
+    /* ===== LICHT-MODUS =====
+       Wechselt beim Klick auf das Icon das komplette Farbschema:
+       Von dunklem Design auf ein HELLGRAUES Design (bewusst kein reines
+       Weiß, damit es nicht blendet, aber hell genug für Tageslicht/Sonne).
+       Alle Flächen, Karten, Popups und Modals bekommen dabei helle
+       Grautöne + dunklen Text statt der hellen/weißen Schrift auf
+       dunklem Grund. Ein erneuter Klick macht alles wieder rückgängig. */
+    body.day-mode {
+      --bg:#ded4ba;
+      --surface:#e6dcc3;
+      --card:#ece3cc;
+      --card2:#d8cdb1;
+      --border:rgba(60,48,30,.12);
+      --border2:rgba(60,48,30,.20);
+      --text:#2b2318;
+      --text2:#5a5142;
+      --muted:#8a7f6a;
+      --blue:#2f5f80;
+      --blue2:#1f4560;
+      --cyan:#336a80;
+      --teal:#a83349;
+      --green:#0b7d57;
+      --green2:#086748;
+      --amber:#c96a0d;
+      --red:#9e3245;
+      --red2:#b23f55;
+      --gold:#b85e2e;
+      --gold-deep:#7a3a1e;
+      --wine:#5c1e2c;
+      --rose:#a83349;
+    }
+    body.day-mode { background:var(--bg); }
+    /* Kein "Licht an"-Glüheffekt am Umschalter — nur ein dezenter Farbwechsel */
+    body.day-mode .btn-daymode.on { color:var(--blue); background:linear-gradient(135deg, rgba(47,95,128,0.16) 0%, rgba(158,50,69,0.12) 100%); }
+    /* Header-Schrift: hell->transparent Verlauf funktioniert nur auf dunklem Grund, hier dunkel */
+    body.day-mode .header-title { background:linear-gradient(135deg,#2b2318 0%, rgba(43,35,24,.6) 100%); -webkit-background-clip:text; background-clip:text; }
+    /* Totalanzeige */
+    body.day-mode .total-panel {
+      background:linear-gradient(145deg, #ece3cc 0%, #e0d5b8 100%);
+      box-shadow:0 8px 26px rgba(60,48,30,.14), inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    body.day-mode .total-panel::before {
+      background:
+        radial-gradient(ellipse 100% 70% at 50% -20%, rgba(240,164,104,0.24) 0%, rgba(240,164,104,0.09) 40%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 85% 110%, rgba(216,90,114,0.16) 0%, transparent 55%);
+    }
+    body.day-mode .total-value {
+      background:linear-gradient(135deg,#2b2318 0%,#b85e2e 55%,#9e3245 100%);
+      -webkit-background-clip:text; background-clip:text;
+      filter:drop-shadow(0 0 20px rgba(201,106,13,0.2)) drop-shadow(0 0 44px rgba(158,50,69,0.12));
+    }
+    body.day-mode .mood-smiley { filter:drop-shadow(0 0 5px rgba(60,48,30,.12)); }
+    body.day-mode .stat-box { background:rgba(60,48,30,.05); border:1px solid rgba(60,48,30,.09); }
+    /* Sparziel */
+    body.day-mode .goal-progress-bar { background:rgba(60,48,30,.08); }
+    /* Aktionsleiste */
+    body.day-mode .btn-reset { background:rgba(60,48,30,.06); border-color:rgba(60,48,30,.12); }
+    body.day-mode .btn-load { background:rgba(11,125,87,.12); border-color:rgba(11,125,87,.32); }
+    /* Karten / Reihen */
+    body.day-mode .item-row,
+    body.day-mode .item-row.filled { background:linear-gradient(135deg, rgba(47,95,128,.18) 0%, rgba(230,222,196,.95) 32%, rgba(201,106,13,.14) 62%, rgba(168,51,73,.16) 100%); border:1px solid rgba(60,48,30,.06); }
+    body.day-mode .item-row:active { background:linear-gradient(135deg, rgba(47,95,128,.28) 0%, rgba(230,222,196,.98) 32%, rgba(201,106,13,.22) 62%, rgba(168,51,73,.26) 100%); }
+    body.day-mode .item-count-num { color:var(--text); }
+    body.day-mode .item-count-sub { color:#0a7060; }
+    /* Plus-Button: Glas-Optik, an den Hellgrau-Ton angepasst */
+    body.day-mode .btn-open-qty { background:rgba(47,95,128,.14); border-color:rgba(47,95,128,.5); color:var(--blue); box-shadow:inset 0 1px 0 rgba(255,255,255,.4); }
+    body.day-mode .btn-open-qty:active { background:rgba(47,95,128,.24); border-color:rgba(47,95,128,.7); }
+    /* Mengen-Popup */
+    body.day-mode .qty-popup {
+      background:linear-gradient(135deg, rgba(47,95,128,.10) 0%, #ece3cc 45%, rgba(168,51,73,.10) 100%), linear-gradient(160deg, #ece3cc 0%, #e0d5b8 100%);
+      box-shadow:0 24px 54px rgba(60,48,30,.20), 0 0 0 1px rgba(60,48,30,.06), inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    body.day-mode .qty-popup-title { color:var(--text); }
+    body.day-mode .qty-popup-last { background:rgba(60,48,30,.05); }
+    body.day-mode .qty-field { background:rgba(60,48,30,.06); border-color:rgba(60,48,30,.16); color:var(--text); }
+    body.day-mode .qty-popup-close { background:rgba(60,48,30,.05); border-color:rgba(60,48,30,.1); }
+    /* Statistik */
+    body.day-mode .stats-card,
+    body.day-mode .kpi-card {
+      background:
+        radial-gradient(circle at 100% 0%, rgba(201,106,13,0.10) 0%, transparent 55%),
+        linear-gradient(135deg, #ece3cc 0%, #e0d5b8 100%);
+      box-shadow:0 4px 16px rgba(60,48,30,.08), inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    body.day-mode .period-tabs { background:rgba(60,48,30,.05); }
+    body.day-mode .period-tab.active { background:linear-gradient(135deg, rgba(201,106,13,0.85), rgba(158,50,69,0.75)); }
+    body.day-mode .stats-list-row { background:linear-gradient(135deg, rgba(60,48,30,.03) 0%, rgba(60,48,30,0) 60%), rgba(60,48,30,.02); }
+    body.day-mode .stats-list-row:active { background:rgba(60,48,30,.06); }
+    body.day-mode .stats-list-amount { color:var(--text); }
+    body.day-mode .stats-list-diff.flat { background:rgba(60,48,30,.06); }
+    body.day-mode .history-clear:active { background:rgba(60,48,30,.05); }
+    /* Modals */
+    body.day-mode .modal-box {
+      background:linear-gradient(160deg, #ece3cc 0%, #e0d5b8 100%);
+      box-shadow:0 22px 44px rgba(60,48,30,.22), inset 0 1px 0 rgba(255,255,255,.5);
+    }
+    body.day-mode .modal-input { background:rgba(60,48,30,.06); border-color:rgba(60,48,30,.16); }
+    body.day-mode .btn-modal-cancel { background:rgba(60,48,30,.05); border-color:rgba(60,48,30,.12); }
+    body.day-mode .btn-modal-close { background:rgba(60,48,30,.05); border-color:rgba(60,48,30,.1); }
+
+    .btn-daymode {
+      flex-shrink:0; width:34px; height:34px; border-radius:50%; margin-top:2px;
+      background:linear-gradient(135deg, rgba(235,148,78,0.279) 0%, rgba(193,74,95,0.186) 100%); border:1px solid transparent;
+      color:var(--amber); font-size:15px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      -webkit-tap-highlight-color:transparent; transition:all .15s;
+    }
+    .btn-daymode:active { background:linear-gradient(135deg, rgba(235,148,78,0.465) 0%, rgba(193,74,95,0.341) 100%); transform:scale(.92); }
+    .btn-daymode.on { color:#ffd679; background:linear-gradient(135deg, rgba(255,214,121,0.4) 0%, rgba(235,148,78,0.35) 100%); }
+    .header-btn-group { display:flex; align-items:flex-start; gap:8px; flex-shrink:0; }
     .header-eyebrow {
       font-size:9px; letter-spacing:3px; text-transform:uppercase;
       color:var(--muted); margin-bottom:5px; font-weight:600;
@@ -172,7 +280,7 @@
 
     /* TOTAL PANEL */
     .total-panel {
-      background:linear-gradient(145deg, rgba(45,53,65,.92) 0%, rgba(30,36,44,.96) 100%);
+      background:linear-gradient(145deg, rgba(22,27,34,.94) 0%, rgba(14,18,22,.97) 100%);
       border:1px solid transparent;
       border-radius:var(--radius); padding:20px 20px 16px;
       margin-bottom:12px; position:relative; overflow:hidden;
@@ -182,12 +290,12 @@
     .total-panel::before {
       content:""; position:absolute; inset:0; pointer-events:none;
       background:
-        radial-gradient(ellipse 100% 70% at 50% -20%, rgba(235,148,78,0.341) 0%, rgba(235,148,78,0.124) 40%, transparent 70%),
-        radial-gradient(ellipse 60% 50% at 85% 110%, rgba(193,74,95,0.186) 0%, transparent 55%);
+        radial-gradient(ellipse 100% 70% at 50% -20%, rgba(240,164,104,0.36) 0%, rgba(240,164,104,0.13) 40%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 85% 110%, rgba(216,90,114,0.2) 0%, transparent 55%);
     }
     .total-panel::after {
       content:""; position:absolute; top:0; left:0; right:0; height:1.5px;
-      background:linear-gradient(90deg,transparent,rgba(235,148,78,0.95),rgba(193,74,95,0.775),transparent);
+      background:linear-gradient(90deg,transparent,rgba(240,164,104,0.95),rgba(216,90,114,0.8),transparent);
       background-size:250% 100%;
       animation:heroShimmer 9s ease-in-out infinite;
     }
@@ -293,10 +401,10 @@
     }
     .btn-load:active { background:rgba(16,185,129,.2); transform:scale(.96); }
     .btn-custom {
-      background:linear-gradient(135deg, rgba(235,148,78,0.279) 0%, rgba(193,74,95,0.186) 100%); border:1.5px solid transparent;
+      background:linear-gradient(135deg, rgba(240,164,104,0.28) 0%, rgba(216,90,114,0.18) 100%); border:1.5px solid transparent;
       color:var(--amber);
     }
-    .btn-custom:active { background:linear-gradient(135deg, rgba(235,148,78,0.465) 0%, rgba(193,74,95,0.341) 100%); transform:scale(.96); }
+    .btn-custom:active { background:linear-gradient(135deg, rgba(240,164,104,0.46) 0%, rgba(216,90,114,0.32) 100%); transform:scale(.96); }
 
     /* SECTION */
     .section-header { display:flex; align-items:center; gap:10px; padding:16px 0 8px; }
@@ -325,30 +433,32 @@
     /* ROWS */
     .items-grid { display:flex; flex-direction:column; gap:6px; }
     .item-row {
-      background:linear-gradient(135deg, rgba(212,88,58,.38) 0%, rgba(45,53,65,.97) 45%, rgba(16,20,28,.30) 100%);
+      background:linear-gradient(135deg, rgba(68,138,190,.38) 0%, rgba(45,53,65,.97) 32%, rgba(240,164,104,.20) 62%, rgba(216,90,114,.30) 100%);
       border-radius:var(--radius-s); padding:10px 14px 10px 10px;
       display:flex; align-items:center; gap:10px;
       position:relative;
       -webkit-tap-highlight-color:transparent;
       transition:background .15s;
     }
-    .item-row:active { background:linear-gradient(135deg, rgba(212,88,58,.52) 0%, rgba(45,53,65,.97) 45%, rgba(16,20,28,.38) 100%); }
+    .item-row:active { background:linear-gradient(135deg, rgba(68,138,190,.52) 0%, rgba(45,53,65,.97) 32%, rgba(240,164,104,.30) 62%, rgba(216,90,114,.44) 100%); }
     .item-row.filled {
-      background:linear-gradient(135deg, rgba(212,88,58,.38) 0%, rgba(45,53,65,.97) 45%, rgba(16,20,28,.30) 100%);
+      background:linear-gradient(135deg, rgba(68,138,190,.38) 0%, rgba(45,53,65,.97) 32%, rgba(240,164,104,.20) 62%, rgba(216,90,114,.30) 100%);
     }
     .item-row.filled .item-name { color:var(--text); }
 
     /* + Button on card */
     .btn-open-qty {
       width:38px; height:38px; border-radius:11px; flex-shrink:0; position:relative; z-index:1;
-      background:linear-gradient(135deg, rgba(235,148,78,.4) 0%, rgba(193,74,95,.4) 100%);
-      border:1.5px solid transparent;
-      color:#fff; font-size:22px; font-weight:300; line-height:1;
+      background:rgba(95,147,184,.16);
+      border:1.5px solid rgba(95,147,184,.55);
+      backdrop-filter:blur(6px);
+      color:var(--blue2); font-size:22px; font-weight:300; line-height:1;
       cursor:pointer; display:flex; align-items:center; justify-content:center;
       -webkit-tap-highlight-color:transparent; transition:all .15s;
       font-family:"Inter",sans-serif;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
     }
-    .btn-open-qty:active { background:linear-gradient(135deg, rgba(235,148,78,.55) 0%, rgba(193,74,95,.55) 100%); transform:scale(.91); }
+    .btn-open-qty:active { background:rgba(95,147,184,.3); border-color:rgba(95,147,184,.75); transform:scale(.91); }
 
     /* CARD COUNT DISPLAY */
     .item-count {
@@ -386,7 +496,7 @@
     /* ===== QTY POPUP ===== */
     .qty-popup-backdrop {
       display:none; position:fixed; inset:0;
-      background:rgba(30,36,44,.78); z-index:250;
+      background:rgba(14,18,22,.88); z-index:250;
       align-items:center; justify-content:center;
       padding:20px 16px;
       backdrop-filter:blur(12px);
@@ -394,8 +504,8 @@
     .qty-popup-backdrop.open { display:flex; }
 
     .qty-popup {
-      --tile-accent: var(--amber);
-      background:linear-gradient(135deg, rgba(95,147,184,.13) 0%, rgba(45,53,65,.98) 45%, rgba(235,148,78,.22) 100%), linear-gradient(160deg, rgba(45,53,65,.98) 0%, rgba(30,36,44,.99) 100%);
+      --tile-accent: #f0a468;
+      background:linear-gradient(135deg, rgba(94,150,190,.16) 0%, rgba(22,27,34,.98) 45%, rgba(216,90,114,.2) 100%), linear-gradient(160deg, rgba(22,27,34,.98) 0%, rgba(14,18,22,.99) 100%);
       border:1px solid transparent;
       border-radius:24px;
       padding:22px 20px 18px;
@@ -575,61 +685,31 @@
       color:var(--muted); margin-bottom:14px; display:flex; align-items:center; gap:6px;
     }
 
-    /* DISTRIBUTION */
-    .dist-bar {
-      display:flex; height:16px; border-radius:8px; overflow:hidden;
-      background:rgba(255,255,255,.05); margin-bottom:14px; border:1px solid var(--border);
+    /* STATS: KPI-KACHEL (Bestand / Rekord oben, Trend unten in Rot/Grün) */
+    .kpi-card { padding:16px 16px 14px; }
+    .kpi-top-row { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+    .kpi-block { min-width:0; }
+    .kpi-block.right { text-align:right; }
+    .kpi-label {
+      font-size:9px; letter-spacing:2px; text-transform:uppercase; font-weight:700;
+      color:var(--muted); margin-bottom:6px; display:flex; align-items:center; gap:5px;
     }
-    .dist-seg { transition:width .5s cubic-bezier(.4,0,.2,1); }
-    .dist-seg.coins { background:var(--amber); }
-    .dist-seg.notes { background:var(--green2); }
-    .dist-seg.custom { background:#a78bfa; }
-    .dist-empty-fill { width:100%; height:100%; background:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 8px,transparent 8px 16px); }
-    .dist-legend { display:flex; flex-direction:column; gap:9px; }
-    .dist-legend-row { display:flex; align-items:center; gap:8px; font-size:12px; }
-    .dist-dot { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
-    .dist-dot.coins { background:var(--amber); }
-    .dist-dot.notes { background:var(--green2); }
-    .dist-dot.custom { background:#a78bfa; }
-    .dist-legend-label { color:var(--text2); font-weight:600; flex:1; }
-    .dist-legend-pct { font-family:"JetBrains Mono",monospace; font-weight:700; color:#fff; width:38px; text-align:right; }
-    .dist-legend-val { font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); width:80px; text-align:right; }
-
-    /* STATS: KPI-ÜBERSICHT (klar & einfach lesbar) */
-    .stats-summary-grid {
-      display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px;
+    .kpi-block.right .kpi-label { justify-content:flex-end; }
+    .kpi-value {
+      font-family:"JetBrains Mono",monospace; font-size:22px; font-weight:700; color:var(--text);
+      line-height:1.15; word-break:break-word;
     }
-    .stats-summary-card {
-      position:relative; overflow:hidden;
-      background:
-        radial-gradient(circle at 100% 0%, rgba(235,148,78,0.139) 0%, transparent 55%),
-        linear-gradient(135deg, rgba(45,53,65,.85) 0%, rgba(30,36,44,.92) 100%);
-      border:1px solid var(--border2); border-radius:var(--radius-s);
-      padding:14px 8px 12px; text-align:center;
-      box-shadow:0 2px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    .kpi-sub { font-size:9px; color:var(--muted); margin-top:3px; font-weight:600; }
+    .kpi-trend-row {
+      margin-top:16px; padding-top:14px; border-top:1px solid var(--border);
+      display:flex; align-items:baseline; gap:7px;
     }
-    .stats-summary-card::before {
-      content:""; position:absolute; top:0; left:0; right:0; height:2.5px;
+    .kpi-trend-val {
+      font-family:"JetBrains Mono",monospace; font-size:17px; font-weight:700; color:var(--muted);
     }
-    .stats-summary-card.acc-blue::before { background:linear-gradient(90deg,#c14a5f,#e0a468); }
-    .stats-summary-card.acc-gold::before { background:linear-gradient(90deg,var(--amber),#e0a468); }
-    .stats-summary-card.acc-trend::before { background:linear-gradient(90deg,var(--muted),var(--text2)); }
-    .stats-summary-card.acc-trend.up::before { background:linear-gradient(90deg,var(--green),var(--green2)); }
-    .stats-summary-card.acc-trend.down::before { background:linear-gradient(90deg,var(--red),var(--red2)); }
-    .stats-summary-icon { font-size:17px; margin-bottom:5px; }
-    .stats-summary-label {
-      font-size:8px; letter-spacing:1.5px; text-transform:uppercase; font-weight:700;
-      color:var(--muted); margin-bottom:5px;
-    }
-    .stats-summary-value {
-      font-family:"JetBrains Mono",monospace; font-size:14px; font-weight:700; color:#fff;
-      line-height:1.25; word-break:break-word;
-    }
-    .stats-summary-value.up { color:var(--green2); }
-    .stats-summary-value.down { color:var(--red2); }
-    .stats-summary-sub {
-      font-size:9px; color:var(--muted); margin-top:3px; font-weight:600;
-    }
+    .kpi-trend-row.up .kpi-trend-val { color:var(--green2); }
+    .kpi-trend-row.down .kpi-trend-val { color:var(--red2); }
+    .kpi-trend-label { font-size:11px; color:var(--muted); font-weight:600; }
     .stats-card-desc {
       font-size:11.5px; color:var(--text2); line-height:1.55; margin:-6px 0 14px;
     }
@@ -818,7 +898,10 @@
       <div class="header-eyebrow">Münzzähler Pro</div>
       <div class="header-title">Geld<span>Zähler</span></div>
     </div>
-    <button class="btn-info" onclick="openInfoModal()" aria-label="Wie funktioniert's?">ⓘ</button>
+    <div class="header-btn-group">
+      <button class="btn-daymode" id="btn-daymode" onclick="toggleDayMode()" aria-label="Heller Modus">🌙</button>
+      <button class="btn-info" onclick="openInfoModal()" aria-label="Wie funktioniert's?">ⓘ</button>
+    </div>
   </div>
 </header>
 
@@ -912,48 +995,21 @@
 
 <div id="view-stats" class="view-page">
 
-  <div class="stats-summary-grid">
-    <div class="stats-summary-card acc-blue">
-      <div class="stats-summary-icon">💰</div>
-      <div class="stats-summary-label">Bestand</div>
-      <div class="stats-summary-value" id="statsCurrentVal">0,00 €</div>
-    </div>
-    <div class="stats-summary-card acc-gold">
-      <div class="stats-summary-icon">🏆</div>
-      <div class="stats-summary-label">Rekord</div>
-      <div class="stats-summary-value" id="statsRecordVal">–</div>
-      <div class="stats-summary-sub" id="statsRecordDate"></div>
-    </div>
-    <div class="stats-summary-card acc-trend" id="statsTrendCard">
-      <div class="stats-summary-icon">📈</div>
-      <div class="stats-summary-label">Seit gestern</div>
-      <div class="stats-summary-value" id="statsTrendVal">–</div>
-    </div>
-  </div>
-
-  <div class="stats-card">
-    <div class="stats-card-title">📊 Verteilung nach Wert</div>
-    <div class="stats-card-desc">Zeigt, wie sich dein aktueller Bestand auf Münzen und Scheine aufteilt.</div>
-    <div class="dist-bar" id="distBar"><div class="dist-empty-fill"></div></div>
-    <div class="dist-legend">
-      <div class="dist-legend-row">
-        <div class="dist-dot coins"></div>
-        <div class="dist-legend-label">🪙 Münzen</div>
-        <div class="dist-legend-val" id="distCoinsVal">0,00 €</div>
-        <div class="dist-legend-pct" id="distCoinsPct">–</div>
+  <div class="stats-card kpi-card">
+    <div class="kpi-top-row">
+      <div class="kpi-block">
+        <div class="kpi-label">💰 Bestand</div>
+        <div class="kpi-value" id="statsCurrentVal">0,00 €</div>
       </div>
-      <div class="dist-legend-row">
-        <div class="dist-dot notes"></div>
-        <div class="dist-legend-label">💵 Scheine</div>
-        <div class="dist-legend-val" id="distNotesVal">0,00 €</div>
-        <div class="dist-legend-pct" id="distNotesPct">–</div>
+      <div class="kpi-block right">
+        <div class="kpi-label">🏆 Rekord</div>
+        <div class="kpi-value" id="statsRecordVal">–</div>
+        <div class="kpi-sub" id="statsRecordDate"></div>
       </div>
-      <div class="dist-legend-row" id="distCustomRow" style="display:none">
-        <div class="dist-dot custom"></div>
-        <div class="dist-legend-label">🏷️ Eigene</div>
-        <div class="dist-legend-val" id="distCustomVal">0,00 €</div>
-        <div class="dist-legend-pct" id="distCustomPct">–</div>
-      </div>
+    </div>
+    <div class="kpi-trend-row" id="statsTrendCard">
+      <span class="kpi-trend-val" id="statsTrendVal">–</span>
+      <span class="kpi-trend-label">seit gestern</span>
     </div>
   </div>
 
@@ -1086,12 +1142,13 @@
       Wie funktioniert's?
     </h2>
     <ul class="modal-steps">
-      <li><div class="step-num">1</div><div><strong>Zählen:</strong> Tippe bei einer Münze oder einem Schein auf <span class="tag">+</span>. Gib ein, wie viele Stück du hast, und bestätige. Der Betrag oben wird sofort aktualisiert.</div></li>
-      <li><div class="step-num">2</div><div><strong>Eigene Posten:</strong> Über "Eigenen Posten hinzufügen" kannst du auch andere Dinge mit eigenem Wert eintragen, zum Beispiel Gutscheine.</div></li>
-      <li><div class="step-num">3</div><div><strong>Sparziel:</strong> Tippe auf 🎯 und gib einen Betrag ein, den du erreichen möchtest. Der Balken zeigt dir, wie weit du schon bist.</div></li>
-      <li><div class="step-num">4</div><div><strong>Speichern & Laden:</strong> Mit den Knöpfen unten kannst du deinen Stand als Datei sichern und später wieder öffnen.</div></li>
-      <li><div class="step-num">5</div><div><strong>Statistik:</strong> Jeden Tag, an dem du zählst, wird dein Bestand automatisch gemerkt — ganz ohne Zutun. Im Tab "Statistik" siehst du oben eine kurze Übersicht (Bestand, Rekord, Veränderung seit gestern), darunter die Verteilung nach Wert und einen Verlauf nach Tag, Woche, Monat oder Jahr. Tippe auf einen Balken, um den genauen Betrag zu sehen.</div></li>
-      <li><div class="step-num">6</div><div><strong>Offline & installierbar:</strong> Die App funktioniert auch ohne Internet. Du kannst sie wie eine normale App auf deinem Startbildschirm speichern.</div></li>
+      <li><div class="step-num">1</div><div><strong>Zählen:</strong> Tippe bei einer Münze oder einem Schein auf das <span class="tag">+</span>-Symbol. Im Popup gibst du die Anzahl ein (oder tippst dich mit den Schritt-Buttons hoch/runter) und bestätigst mit Übernehmen.</div></li>
+      <li><div class="step-num">2</div><div><strong>Eigene Posten:</strong> Über "+ Eigener" legst du eigene Werte an, z. B. Gutscheine oder Sonderposten mit frei wählbarem Betrag.</div></li>
+      <li><div class="step-num">3</div><div><strong>Sparziel:</strong> Tippe auf 🎯 bei "Sparziel", gib deinen Zielbetrag ein und verfolge den Fortschritt live an der Balkenanzeige.</div></li>
+      <li><div class="step-num">4</div><div><strong>Speichern & Laden:</strong> Mit "Speichern" sicherst du deinen aktuellen Stand als Datei, mit "Laden" spielst du eine gespeicherte Datei wieder ein.</div></li>
+      <li><div class="step-num">5</div><div><strong>Statistik:</strong> Im Tab "Statistik" siehst du deinen Bestand, deinen bisherigen Rekord sowie den Trend seit gestern — grün heißt mehr Geld, rot heißt weniger. Darunter findest du den Verlauf über Tag, Woche, Monat und Jahr.</div></li>
+      <li><div class="step-num">6</div><div><strong>Heller Modus:</strong> Tippe oben rechts auf 🌙, um zwischen dem dunklen und einem warmen, eierschalfarbenen Design für Tageslicht umzuschalten. Ein erneutes Tippen wechselt wieder zurück.</div></li>
+      <li><div class="step-num">7</div><div><strong>Offline:</strong> Die App funktioniert komplett ohne Internetverbindung und lässt sich auf dem Homescreen installieren.</div></li>
     </ul>
     <button class="btn-modal-close" onclick="closeInfoModal()">Verstanden</button>
   </div>
@@ -1192,6 +1249,20 @@ function closeInfoModal(){document.getElementById("info-modal").classList.remove
 document.getElementById("info-modal").addEventListener("click",e=>{
   if(e.target===document.getElementById("info-modal"))closeInfoModal();
 });
+function applyDayMode(on){
+  document.body.classList.toggle("day-mode",on);
+  const btn=document.getElementById("btn-daymode");
+  btn.classList.toggle("on",on);
+  btn.textContent=on?"☀️":"🌙";
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta)meta.setAttribute("content",on?"#ded4ba":"#0e1216");
+}
+function toggleDayMode(){
+  const on=!document.body.classList.contains("day-mode");
+  applyDayMode(on);
+  try{localStorage.setItem("mz_daymode",on?"1":"0");}catch(e){}
+}
+try{applyDayMode(localStorage.getItem("mz_daymode")==="1");}catch(e){}
 function updateGoalUI(totalCent){
   const btn=document.getElementById("goalEditBtn");
   const wrap=document.getElementById("goalProgressWrap");
@@ -1448,7 +1519,6 @@ function recalc(){
   document.getElementById("countAll").textContent=totalPieces;
   updateMood(total);
   lastTotal=total;lastTotalPieces=totalPieces;
-  updateDistribution(coinsValue,notesValue,customValue,total);
   updateGoalUI(total);
   upsertTodayLog(total);
   saveState();
@@ -1583,28 +1653,6 @@ function switchView(view){
   if(view==="stats")renderStatsChart();
 }
 
-// ===== VERTEILUNG =====
-function updateDistribution(coinsValue,notesValue,customValue,total){
-  const bar=document.getElementById("distBar");
-  const hasCustom=customItems.length>0;
-  document.getElementById("distCustomRow").style.display=hasCustom?"flex":"none";
-  if(total<=0){
-    bar.innerHTML=`<div class="dist-empty-fill"></div>`;
-    document.getElementById("distCoinsPct").textContent="–";
-    document.getElementById("distNotesPct").textContent="–";
-    document.getElementById("distCustomPct").textContent="–";
-  }else{
-    const pc=coinsValue/total*100,pn=notesValue/total*100,pcu=customValue/total*100;
-    bar.innerHTML=`<div class="dist-seg coins" style="width:${pc}%"></div><div class="dist-seg notes" style="width:${pn}%"></div><div class="dist-seg custom" style="width:${pcu}%"></div>`;
-    document.getElementById("distCoinsPct").textContent=Math.round(pc)+"%";
-    document.getElementById("distNotesPct").textContent=Math.round(pn)+"%";
-    document.getElementById("distCustomPct").textContent=Math.round(pcu)+"%";
-  }
-  document.getElementById("distCoinsVal").textContent=fmt(coinsValue);
-  document.getElementById("distNotesVal").textContent=fmt(notesValue);
-  document.getElementById("distCustomVal").textContent=fmt(customValue);
-}
-
 // ===== STATISTIK: automatisches Tages-Log =====
 // Kein manuelles "Foto"/Snapshot mehr — jeden Tag wird beim Zählen automatisch
 // der aktuelle Stand für "heute" gemerkt (fortlaufend überschrieben).
@@ -1723,12 +1771,12 @@ function updateStatsSummary(){
   const trendCard=document.getElementById("statsTrendCard");
   trendCard.classList.remove("up","down");
   if(!prevEntry){
-    trendEl.textContent="–";trendEl.className="stats-summary-value";
+    trendEl.textContent="–";trendEl.className="kpi-trend-val";
   }else{
     const diff=(lastTotal||0)-prevEntry.total;
-    if(diff>0){trendEl.textContent="▲ "+fmt(diff);trendEl.className="stats-summary-value up";trendCard.classList.add("up");}
-    else if(diff<0){trendEl.textContent="▼ "+fmt(-diff);trendEl.className="stats-summary-value down";trendCard.classList.add("down");}
-    else{trendEl.textContent="± 0,00 €";trendEl.className="stats-summary-value";}
+    if(diff>0){trendEl.textContent="▲ "+fmt(diff);trendEl.className="kpi-trend-val";trendCard.classList.add("up");}
+    else if(diff<0){trendEl.textContent="▼ "+fmt(-diff);trendEl.className="kpi-trend-val";trendCard.classList.add("down");}
+    else{trendEl.textContent="± 0,00 €";trendEl.className="kpi-trend-val";}
   }
 }
 function getBucketKeyDay(ts){
